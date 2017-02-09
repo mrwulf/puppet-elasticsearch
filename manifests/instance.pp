@@ -430,15 +430,10 @@ define elasticsearch::instance(
     }
 
     if $security_plugin != undef {
-      $_security_source = $security_plugin ? {
-        'shield' => $elasticsearch::params::homedir,
-        'x-pack' => $elasticsearch::configdir,
-      }
-
       file { "${instance_configdir}/${security_plugin}":
         ensure  => 'directory',
         mode    => '0644',
-        source  => "${_security_source}/${security_plugin}",
+        source  => "${elasticsearch::configdir}/${security_plugin}",
         recurse => 'remote',
         owner   => 'root',
         group   => '0',
@@ -491,7 +486,7 @@ define elasticsearch::instance(
       $instance_init_defaults = { }
     }
     $init_defaults_new = merge(
-      { 'DATA_DIR'  => '$ES_HOME/data' },
+      { 'DATA_DIR'  => $elasticsearch::params::datadir },
       $global_init_defaults,
       $instance_init_defaults_main,
       $instance_init_defaults
